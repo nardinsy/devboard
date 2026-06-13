@@ -27,3 +27,5 @@
 - Hooks depend on IRepository interfaces, never on implementations directly
 - MockRepository used in dev/test, HttpRepository added when real backend exists
 - Swap backend = add one file, change one import. Zero component changes.
+- Route-level pages live inside their feature folder (features/auth/pages/)
+- src/pages/ reserved for app-level pages that span multiple features
