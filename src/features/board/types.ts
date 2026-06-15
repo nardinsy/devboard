@@ -28,3 +28,15 @@ export interface Board {
   columns: Column[];
   createdAt: string;
 }
+
+export interface CreateTaskDto {
+  title: string;
+  priority: Priority;
+  label: Label;
+  status: ColumnStatus;
+  boardId: string;
+  description?: string;
+  dueDate?: string;
+}
+
+export type UpdateTaskDto = Partial<Omit<Task, 'id' | 'createdAt'>>;
