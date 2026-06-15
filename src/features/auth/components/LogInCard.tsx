@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DottedSeparator } from '@/components/DottedSeparator';
 import { Input } from '@/components/ui/input';
+import { PROTECTED_ROUTES } from '@/router/routes';
 
 export const LogInCard = () => {
   const { mutate, isPending, error } = useLogin();
@@ -28,7 +29,7 @@ export const LogInCard = () => {
 
   const onSubmit: SubmitHandler<LoginFormData> = (values) => {
     mutate(values, {
-      onSuccess: () => navigate('/board'),
+      onSuccess: () => navigate(PROTECTED_ROUTES.BOARD),
     });
   };
 
