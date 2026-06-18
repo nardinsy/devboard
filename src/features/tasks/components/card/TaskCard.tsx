@@ -1,0 +1,75 @@
+import clsx from 'clsx';
+import { formatISODate } from '@/utils/date';
+import { Label, Priority, Task } from '@/features/board/types';
+
+const cardBorderVariants: Record<Priority, string> = {
+  low: 'border border-green-600',
+  medium: 'border border-amber-600',
+  high: 'border border-red-600',
+};
+
+const labelVariants: Record<Label, string> = {
+  bug: 'bg-red-100 text-red-700',
+  feature: 'bg-sky-200 text-sky-800',
+  perf: 'bg-amber-100 text-amber-700',
+  docs: 'bg-green-100 text-green-800',
+};
+
+const priorityTextVariants: Record<Priority, string> = {
+  low: 'text-green-600',
+  medium: 'text-amber-600',
+  high: 'text-red-600',
+};
+
+const TaskLabel = ({ label }: { label: Label }) => {
+  return (
+    <span
+      className={`${labelVariants[label]} inline-flex items-center rounded-lg px-2 py-1 text-xs`}
+    >
+      {label}
+    </span>
+  );
+};
+
+const TaskDueDate = ({ date }: { date: string }) => {
+  return <div className="text-gray-500 text-xs">{formatISODate(date)}</div>;
+};
+
+const TaskPriority = ({ priority }: { priority: Priority }) => {
+  return (
+    <div
+      className={`${priorityTextVariants[priority]} text-xs font-medium`}
+      aria-label={`Priority: ${priority}`}
+    >
+      {priority}
+    </div>
+  );
+};
+
+// TODO: I can put user's avarat instead of username nice
+const TaskAssignee = () => {
+  return (
+    <div className="w-6 h-6 flex justify-center items-center rounded-full bg-sky-100 text-sky-800 text-xs font-medium">
+      AD
+    </div>
+  );
+};
+
+export const TaskCard = ({ task }: { task: Task }) => {
+  return (
+    <article
+      className={clsx(
+        'w-56 min-h-24 flex flex-col justify-between rounded-2xl p-2',
+        cardBorderVariants[task.priority]
+      )}
+    >
+      <h3 className="font-semibold text-sm text-gray-900">{task.title}</h3>
+      <div className="flex gap-2 items-center">
+        <TaskLabel label={task.label} />
+        {task.dueDate && <TaskDueDate date={task.dueDate} />}
+        <TaskPriority priority={task.priority} />
+        <TaskAssignee />
+      </div>
+    </article>
+  );
+};
