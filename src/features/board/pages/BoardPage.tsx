@@ -1,5 +1,5 @@
-import { TaskCard } from '@/features/tasks/components/card/TaskCard';
 import { Task } from '../types';
+import { BoardColumn } from '../components/BoardColumn';
 
 const tasks: Task[] = [
   {
@@ -58,10 +58,8 @@ const BoardPage = () => {
     // <div className="min-h-screen flex flex-col items-center justify-center">
     //   <h1 className="text-2xl font-semibold text-gray-600">Board — Phase 3 coming soon</h1>
     // </div>
-    <div className="ml-96 space-y-6">
-      {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} />
-      ))}
+    <div className="ml-96">
+      <BoardColumn status={'in-progress'} tasks={tasks} />
     </div>
   );
 };

@@ -59,7 +59,7 @@ export const TaskCard = ({ task }: { task: Task }) => {
   return (
     <article
       className={clsx(
-        'w-56 min-h-24 flex flex-col justify-between rounded-2xl p-2',
+        'w-full min-h-24 flex flex-col justify-between rounded-2xl p-2 bg-white shadow-sm',
         cardBorderVariants[task.priority]
       )}
     >
