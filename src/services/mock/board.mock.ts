@@ -6,7 +6,7 @@ let DUMMY_TASKS: Task[] = [
     id: 'task-1',
     title: 'Setup CI/CD pipeline',
     description: 'Description',
-    priority: 'low',
+    priority: 'medium',
     label: 'feature',
     status: 'in-progress',
     assigneeId: '1',
@@ -18,7 +18,7 @@ let DUMMY_TASKS: Task[] = [
     id: 'task-2',
     title: 'Implement drag and drop',
     description: 'Description',
-    priority: 'medium',
+    priority: 'high',
     label: 'perf',
     status: 'in-review',
     assigneeId: '1',
@@ -30,7 +30,7 @@ let DUMMY_TASKS: Task[] = [
     id: 'task-3',
     title: 'Write API documentation',
     description: 'Description',
-    priority: 'high',
+    priority: 'low',
     label: 'docs',
     status: 'done',
     assigneeId: '1',
@@ -163,7 +163,8 @@ export class MockBoardRepository implements IBoardRepository {
   }
 
   async getTasks(boardId: string): Promise<Task[]> {
-    await delay(500);
+    // throw new Error('');
+    await delay(1000);
     return DUMMY_TASKS.filter((task) => task.boardId === boardId);
   }
 

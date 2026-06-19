@@ -16,7 +16,15 @@ const statusTitleVariants: Record<ColumnStatus, string> = {
   todo: 'Todo',
 };
 
-export const BoardColumn = ({ status, tasks }: { status: ColumnStatus; tasks: Task[] }) => {
+export const BoardColumn = ({
+  status,
+  tasks,
+  isLoading,
+}: {
+  status: ColumnStatus;
+  tasks: Task[];
+  isLoading: boolean;
+}) => {
   const content =
     tasks.length === 0 ? (
       <div className="flex justify-center py-8 text-gray-400 text-sm">No task yet</div>
@@ -27,6 +35,7 @@ export const BoardColumn = ({ status, tasks }: { status: ColumnStatus; tasks: Ta
         ))}
       </div>
     );
+
   return (
     <section className="flex flex-col gap-3 bg-neutral-100 rounded-xl p-3 w-72">
       <div className="flex items-center justify-between px-1 text-gray-800">
@@ -38,13 +47,17 @@ export const BoardColumn = ({ status, tasks }: { status: ColumnStatus; tasks: Ta
           </span>
         </div>
         <button
-          className="text-gray-400 hover:text-gray-600 hover-bg-white rounded-md p-1 transition-colors cursor-pointer"
+          className="text-gray-400 hover:text-gray-600 hover:bg-white rounded-md p-1 transition-colors cursor-pointer"
           aria-label="Add task"
         >
           +
         </button>
       </div>
-      {content}
+      {isLoading ? (
+        <div className="flex justify-center py-8 text-gray-400 text-sm">Loading ...</div>
+      ) : (
+        content
+      )}
     </section>
   );
 };
