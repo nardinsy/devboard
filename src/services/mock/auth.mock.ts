@@ -5,14 +5,14 @@ type MockUser = User & { password: string };
 const DUMMY_USERS: MockUser[] = [
   {
     id: '1',
-    name: 'Admin',
+    name: 'User-1',
     role: 'admin',
     email: 'admin@devboard.com',
     password: '123',
   },
   {
     id: '2',
-    name: 'Member',
+    name: 'User-2',
     role: 'member',
     email: 'member@devboard.com',
     password: '123',

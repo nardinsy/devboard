@@ -2,8 +2,8 @@ import clsx from 'clsx';
 import { useTasks } from '../hooks/useTasks';
 import { BoardColumn } from '@/features/board/components/BoardColumn';
 
-export const BoardContent = () => {
-  const { data: tasks, error, isLoading } = useTasks('board-1');
+export const BoardContent = ({ boardId }: { boardId: string }) => {
+  const { data: tasks, error, isLoading } = useTasks(boardId);
 
   const todoTasks = tasks?.filter((task) => task.status === 'todo');
   const inProgressTasks = tasks?.filter((task) => task.status === 'in-progress');
@@ -27,7 +27,7 @@ export const BoardContent = () => {
       )}
       <section
         className={clsx(
-          'overflow-x-scroll h-screen flex flex-row gap-2 md:justify-center py-2',
+          'overflow-x-scroll h-screen flex flex-row gap-2 px-2 md:justify-center py-2',
           error && 'pointer-events-none'
         )}
       >

@@ -37,7 +37,7 @@ export const BoardColumn = ({
     );
 
   return (
-    <section className="flex flex-col gap-3 bg-neutral-100 rounded-xl p-3 w-72">
+    <section className="flex flex-col gap-3 bg-neutral-100 rounded-xl p-3 min-w-72">
       <div className="flex items-center justify-between px-1 text-gray-800">
         <div className="flex items-center gap-2">
           <span className={clsx('w-2.5 h-2.5 rounded-full', statusIconVariants[status])} />
