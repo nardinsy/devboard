@@ -3,7 +3,7 @@ export const PUBLIC_ROUTES = {
 } as const;
 
 export const PROTECTED_ROUTES = {
-  BOARD: '/board',
+  BOARD: '/board/:boardId',
 } as const;
 
 export const ROUTES = {
@@ -16,3 +16,7 @@ export const publicRoutesArray = Object.values(PUBLIC_ROUTES);
 export const protectedRoutesArray = Object.values(PROTECTED_ROUTES);
 
 export const DEFAULT_REDIRECT = PROTECTED_ROUTES.BOARD;
+
+export const ROUTE_BUILDERS = {
+  board: (boardId: string) => PROTECTED_ROUTES.BOARD.replace(':boardId', boardId),
+} as const;
