@@ -165,6 +165,8 @@ export class MockBoardRepository implements IBoardRepository {
   async getTasks(boardId: string): Promise<Task[]> {
     // throw new Error('');
     await delay(1000);
+    const boardExists = DUMMY_BOARD.id === boardId;
+    if (!boardExists) throw new Error('Board not found');
     return DUMMY_TASKS.filter((task) => task.boardId === boardId);
   }
 
@@ -188,5 +190,12 @@ export class MockBoardRepository implements IBoardRepository {
 
     await delay(500);
     return DUMMY_TASKS[index];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async getUserBoards(userId: string): Promise<Board[]> {
+    await delay(500);
+
+    return [DUMMY_BOARD];
   }
 }

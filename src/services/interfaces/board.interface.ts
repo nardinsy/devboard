@@ -7,4 +7,5 @@ export interface IBoardRepository {
   updateTask: (id: string, data: UpdateTaskDto) => Promise<Task>;
   moveTask: (id: string, status: ColumnStatus) => Promise<Task>;
   deleteTask: (id: string) => Promise<void>;
+  getUserBoards: (userId: string) => Promise<Board[]>;
 }
