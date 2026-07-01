@@ -1,12 +1,5 @@
-import clsx from 'clsx';
 import { formatISODate } from '@/utils/date';
 import { Label, Priority, Task } from '@/features/board/types';
-
-const cardBorderVariants: Record<Priority, string> = {
-  low: 'border border-green-600',
-  medium: 'border border-amber-600',
-  high: 'border border-red-600',
-};
 
 const labelVariants: Record<Label, string> = {
   bug: 'bg-red-100 text-red-700',
@@ -55,14 +48,9 @@ const TaskAssignee = () => {
   );
 };
 
-export const TaskCard = ({ task }: { task: Task }) => {
+export const TaskCardContent = ({ task }: { task: Task }) => {
   return (
-    <article
-      className={clsx(
-        'w-full min-h-24 flex flex-col justify-between rounded-2xl p-2 bg-white shadow-sm',
-        cardBorderVariants[task.priority]
-      )}
-    >
+    <>
       <h3 className="font-semibold text-sm text-gray-900">{task.title}</h3>
       <div className="flex gap-2 items-center">
         <TaskLabel label={task.label} />
@@ -70,6 +58,6 @@ export const TaskCard = ({ task }: { task: Task }) => {
         <TaskPriority priority={task.priority} />
         <TaskAssignee />
       </div>
-    </article>
+    </>
   );
 };

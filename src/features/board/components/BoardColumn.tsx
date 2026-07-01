@@ -1,6 +1,9 @@
-import { TaskCard } from '@/features/tasks/components/card/TaskCard';
-import { ColumnStatus, Task } from '../types';
+import { UniqueIdentifier, useDroppable } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import clsx from 'clsx';
+
+import { TaskCard } from '@/features/tasks/components/TaskCard';
+import { ColumnStatus, Task } from '../types';
 
 const statusIconVariants: Record<ColumnStatus, string> = {
   'in-progress': 'bg-sky-300',
@@ -17,27 +20,35 @@ const statusTitleVariants: Record<ColumnStatus, string> = {
 };
 
 export const BoardColumn = ({
+  id,
   status,
   tasks,
   isLoading,
 }: {
+  id: UniqueIdentifier;
   status: ColumnStatus;
   tasks: Task[];
   isLoading: boolean;
 }) => {
+  const { setNodeRef } = useDroppable({ id });
+
   const content =
     tasks.length === 0 ? (
       <div className="flex justify-center py-8 text-gray-400 text-sm">No task yet</div>
     ) : (
-      <div className="space-y-2.5">
+      <ul className="space-y-2.5">
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard key={task.id} id={task.id} task={task} />
         ))}
-      </div>
+      </ul>
     );
 
   return (
-    <section className="flex flex-col gap-3 bg-neutral-100 rounded-xl p-3 min-w-72">
+    <section
+      ref={setNodeRef}
+      className="flex flex-col gap-3 bg-neutral-100 rounded-xl p-3 min-w-72"
+    >
+      {/* Header */}
       <div className="flex items-center justify-between px-1 text-gray-800">
         <div className="flex items-center gap-2">
           <span className={clsx('w-2.5 h-2.5 rounded-full', statusIconVariants[status])} />
@@ -53,11 +64,14 @@ export const BoardColumn = ({
           +
         </button>
       </div>
-      {isLoading ? (
-        <div className="flex justify-center py-8 text-gray-400 text-sm">Loading ...</div>
-      ) : (
-        content
-      )}
+
+      <SortableContext items={tasks.map((task) => task.id)} strategy={verticalListSortingStrategy}>
+        {isLoading ? (
+          <div className="flex justify-center py-8 text-gray-400 text-sm">Loading ...</div>
+        ) : (
+          content
+        )}
+      </SortableContext>
     </section>
   );
 };

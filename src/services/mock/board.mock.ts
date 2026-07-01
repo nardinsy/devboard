@@ -170,19 +170,6 @@ export class MockBoardRepository implements IBoardRepository {
     return DUMMY_TASKS.filter((task) => task.boardId === boardId);
   }
 
-  async moveTask(id: string, status: ColumnStatus): Promise<Task> {
-    const index = DUMMY_TASKS.findIndex((task) => id === task.id);
-    if (index === -1) throw new Error('Please try again');
-
-    const oldStatus = DUMMY_TASKS[index].status;
-    deleteFromBoard(oldStatus, id);
-    addToBoard(status, id);
-    DUMMY_TASKS[index].status = status;
-
-    await delay(500);
-    return DUMMY_TASKS[index];
-  }
-
   async updateTask(id: string, data: UpdateTaskDto): Promise<Task> {
     const index = DUMMY_TASKS.findIndex((task) => id === task.id);
     if (index === -1) throw new Error('Not found');
@@ -193,9 +180,24 @@ export class MockBoardRepository implements IBoardRepository {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async getUserBoards(userId: string): Promise<Board[]> {
+  async getUserBoards(_userId: string): Promise<Board[]> {
     await delay(500);
 
     return [DUMMY_BOARD];
+  }
+
+  async updateColumnOrder(updates: { status: ColumnStatus; taskIds: string[] }[]): Promise<void> {
+    await delay(500);
+    updates.forEach((update) => {
+      const col = DUMMY_BOARD.columns.find((col) => col.status === update.status);
+      if (!col) throw new Error(`Column with status "${update.status}" not found`);
+      col.taskIds = update.taskIds;
+
+      update.taskIds.forEach((tId) => {
+        const t = DUMMY_TASKS.find((task) => tId === task.id);
+        if (!t) throw new Error(`Task with id "${tId}" not found`);
+        t.status = update.status;
+      });
+    });
   }
 }
