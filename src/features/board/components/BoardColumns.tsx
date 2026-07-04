@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -33,6 +33,8 @@ export const BoardColumns = ({
   const [columns, setColumns] = useState<ColumnsData[]>(columnsData);
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
+  const snapshotRef = useRef<ColumnsData[] | null>(null);
+
   const { mutate } = useUpdateColumnOrder('board-1');
 
   const sensors = useSensors(
@@ -65,10 +67,13 @@ export const BoardColumns = ({
   };
 
   const handleDragStart = (event: DragStartEvent) => {
+    snapshotRef.current = columns;
     setActiveId(event.active.id);
   };
 
   const handleDragCancel = () => {
+    if (snapshotRef.current) setColumns(snapshotRef.current);
+    snapshotRef.current = null;
     setActiveId(null);
   };
 
@@ -137,6 +142,8 @@ export const BoardColumns = ({
     const { active, over } = event;
 
     if (!over) {
+      if (snapshotRef.current) setColumns(snapshotRef.current);
+      snapshotRef.current = null;
       setActiveId(null);
       return;
     }
