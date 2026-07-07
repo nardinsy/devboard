@@ -3,7 +3,8 @@ import clsx from 'clsx';
 
 import { useTasks } from '../hooks/useTasks';
 import { BoardColumns } from './BoardColumns';
-import { ColumnStatus, Task } from '../types';
+import { ColumnStatus } from '../types';
+import { Task } from '@/features/tasks/types';
 
 export const BoardContent = ({ boardId }: { boardId: string }) => {
   const { data: tasks, error, isLoading, dataUpdatedAt } = useTasks(boardId);

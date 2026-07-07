@@ -1,5 +1,6 @@
-import { Board, ColumnStatus, CreateTaskDto, Task, UpdateTaskDto } from '@/features/board/types';
 import { IBoardRepository } from '../interfaces/board.interface';
+import { Board, ColumnStatus } from '@/features/board/types';
+import { CreateTaskDto, Task, UpdateTaskDto } from '@/features/tasks/types';
 
 let DUMMY_TASKS: Task[] = [
   {

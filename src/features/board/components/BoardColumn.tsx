@@ -3,7 +3,8 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import clsx from 'clsx';
 
 import { TaskCard } from '@/features/tasks/components/TaskCard';
-import { ColumnStatus, Task } from '../types';
+import { ColumnStatus } from '../types';
+import { Task } from '@/features/tasks/types';
 
 const statusIconVariants: Record<ColumnStatus, string> = {
   'in-progress': 'bg-sky-300',

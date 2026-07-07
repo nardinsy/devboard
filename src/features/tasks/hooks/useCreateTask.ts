@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { boardRepository } from '@/services';
-import { CreateTaskDto } from '../types';
+import { CreateTaskDto } from '@/features/tasks/types';
 
 export const useCreateTask = () => {
   const queryClient = useQueryClient();

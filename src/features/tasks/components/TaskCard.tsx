@@ -4,7 +4,8 @@ import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
 
 import { TaskCardContent } from './TaskCardContent';
-import { Priority, Task } from '@/features/board/types';
+import { Priority } from '@/features/board/types';
+import { Task } from '../types';
 
 const cardBorderVariants: Record<Priority, string> = {
   low: 'border border-green-600',

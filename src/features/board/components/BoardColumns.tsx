@@ -11,7 +11,8 @@ import {
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { ColumnStatus, Task } from '../types';
+import { ColumnStatus } from '../types';
+import { Task } from '@/features/tasks/types';
 import { BoardColumn } from './BoardColumn';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useUpdateColumnOrder } from '../hooks/useUpdateColumnOrder';

@@ -1,6 +1,7 @@
 import clsx from 'clsx';
-import { Priority, Task } from '@/features/board/types';
+import { Priority } from '@/features/board/types';
 import { TaskCardContent } from './TaskCardContent';
+import { Task } from '../types';
 
 const cardBorderVariants: Record<Priority, string> = {
   low: 'border border-green-600',

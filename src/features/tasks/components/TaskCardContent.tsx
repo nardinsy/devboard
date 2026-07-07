@@ -1,5 +1,6 @@
 import { formatISODate } from '@/utils/date';
-import { Label, Priority, Task } from '@/features/board/types';
+import { Label, Priority } from '@/features/board/types';
+import { Task } from '../types';
 
 const labelVariants: Record<Label, string> = {
   bug: 'bg-red-100 text-red-700',
