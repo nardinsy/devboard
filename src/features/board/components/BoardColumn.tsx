@@ -1,10 +1,13 @@
 import { UniqueIdentifier, useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import clsx from 'clsx';
+import { Plus } from 'lucide-react';
 
 import { TaskCard } from '@/features/tasks/components/TaskCard';
 import { ColumnStatus } from '../types';
 import { Task } from '@/features/tasks/types';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ROUTE_BUILDERS } from '@/router/routes';
 
 const statusIconVariants: Record<ColumnStatus, string> = {
   'in-progress': 'bg-sky-300',
@@ -32,6 +35,8 @@ export const BoardColumn = ({
   isLoading: boolean;
 }) => {
   const { setNodeRef } = useDroppable({ id });
+  const { boardId } = useParams<{ boardId: string }>();
+  const navigate = useNavigate();
 
   const content =
     tasks.length === 0 ? (
@@ -59,10 +64,11 @@ export const BoardColumn = ({
           </span>
         </div>
         <button
-          className="text-gray-400 hover:text-gray-600 hover:bg-white rounded-md p-1 transition-colors cursor-pointer"
+          onClick={() => navigate(ROUTE_BUILDERS.createTask(boardId!, status))}
+          className="text-gray-400 hover:text-gray-600 hover:bg-white rounded-full p-1 transition-colors cursor-pointer"
           aria-label="Add task"
         >
-          +
+          <Plus size={14} />
         </button>
       </div>
 
