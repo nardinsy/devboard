@@ -1,4 +1,5 @@
-import { Board, ColumnStatus, Task, CreateTaskDto, UpdateTaskDto } from '@/features/board/types';
+import { Board, ColumnStatus } from '@/features/board/types';
+import { CreateTaskDto, Task, UpdateTaskDto } from '@/features/tasks/types';
 
 export interface IBoardRepository {
   getBoard: (boardId: string) => Promise<Board>;

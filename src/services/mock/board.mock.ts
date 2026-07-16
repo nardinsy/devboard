@@ -168,7 +168,12 @@ export class MockBoardRepository implements IBoardRepository {
     await delay(1000);
     const boardExists = DUMMY_BOARD.id === boardId;
     if (!boardExists) throw new Error('Board not found');
-    return DUMMY_TASKS.filter((task) => task.boardId === boardId);
+    // return DUMMY_TASKS.filter((task) => task.boardId === boardId);
+    return DUMMY_BOARD.columns.flatMap((col) =>
+      col.taskIds
+        .map((id) => DUMMY_TASKS.find((task) => task.id === id))
+        .filter((task): task is Task => task !== undefined)
+    );
   }
 
   async updateTask(id: string, data: UpdateTaskDto): Promise<Task> {

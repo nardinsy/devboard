@@ -35,7 +35,9 @@ export const BoardColumns = ({
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
   const snapshotRef = useRef<ColumnsData[] | null>(null);
+  const initialColumnIdRef = useRef<UniqueIdentifier | undefined>(null);
 
+  // TODO get boardId from props
   const { mutate } = useUpdateColumnOrder('board-1');
 
   const sensors = useSensors(
@@ -68,6 +70,7 @@ export const BoardColumns = ({
   };
 
   const handleDragStart = (event: DragStartEvent) => {
+    initialColumnIdRef.current = findColumnId(event.active.id);
     snapshotRef.current = columns;
     setActiveId(event.active.id);
   };
@@ -103,7 +106,7 @@ export const BoardColumns = ({
       const activeTask = activeColumn.tasks.find((task) => task.id === activeId);
       if (!activeTask) return prev;
 
-      const newColumns = prev.map((column) => {
+      return prev.map((column) => {
         if (column.id === activeColumnId) {
           return {
             ...column,
@@ -112,30 +115,26 @@ export const BoardColumns = ({
         }
 
         if (column.id === overColumnId) {
-          if (overId === overColumnId) {
+          const overTaskIndex = column.tasks.findIndex((task) => task.id === overId);
+          if (overId === overColumnId || overTaskIndex === -1) {
             return {
               ...column,
               tasks: [...column.tasks, activeTask],
             };
           }
 
-          const overTaskIndex = column.tasks.findIndex((task) => task.id === overId);
-          if (overTaskIndex !== -1) {
-            return {
-              ...column,
-              tasks: [
-                ...column.tasks.slice(0, overTaskIndex + 1),
-                activeTask,
-                ...column.tasks.slice(overTaskIndex + 1),
-              ],
-            };
-          }
+          const isBelowOverItem =
+            active.rect.current.translated &&
+            active.rect.current.translated.top > over.rect.top + over.rect.height / 2;
+
+          const newIndex = isBelowOverItem ? overTaskIndex + 1 : overTaskIndex;
+          const newTasks = [...column.tasks];
+          newTasks.splice(newIndex, 0, activeTask);
+          return { ...column, tasks: newTasks };
         }
 
         return column;
       });
-
-      return newColumns;
     });
   };
 
@@ -152,7 +151,8 @@ export const BoardColumns = ({
     const activeId = active.id;
     const overId = over.id;
 
-    const activeColumnId = findColumnId(activeId);
+    // const activeColumnId = findColumnId(activeId);
+    const activeColumnId = initialColumnIdRef.current;
     const overColumnId = findColumnId(overId);
 
     if (!activeColumnId || !overColumnId) {
@@ -191,8 +191,8 @@ export const BoardColumns = ({
     }
 
     if (activeColumnId !== overColumnId && overId) {
-      const sourceCol = columns.find((col) => col.status === activeColumnId);
-      const destCol = columns.find((col) => col.status === overColumnId);
+      const sourceCol = columns.find((col) => col.id === activeColumnId);
+      const destCol = columns.find((col) => col.id === overColumnId);
 
       if (!sourceCol || !destCol) return;
       updateColumns([
