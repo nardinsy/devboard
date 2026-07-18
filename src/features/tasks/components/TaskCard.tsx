@@ -3,7 +3,7 @@ import { UniqueIdentifier } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
 
-import { TaskCardContent } from './TaskCardContent';
+import { MemoizedTaskCardContent } from './TaskCardContent';
 import { Priority } from '@/features/board/types';
 import { Task } from '../types';
 
@@ -34,7 +34,7 @@ export const TaskCard = ({ id, task }: { id: UniqueIdentifier; task: Task }) => 
         cardBorderVariants[task.priority]
       )}
     >
-      <TaskCardContent task={task} />
+      <MemoizedTaskCardContent task={task} />
     </li>
   );
 };

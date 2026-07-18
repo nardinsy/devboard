@@ -1,6 +1,7 @@
 import { formatISODate } from '@/utils/date';
 import { Label, Priority } from '@/features/board/types';
 import { Task } from '../types';
+import React from 'react';
 
 const labelVariants: Record<Label, string> = {
   bug: 'bg-red-100 text-red-700',
@@ -49,7 +50,7 @@ const TaskAssignee = () => {
   );
 };
 
-export const TaskCardContent = ({ task }: { task: Task }) => {
+export const MemoizedTaskCardContent = ({ task }: { task: Task }) => {
   return (
     <>
       <h3 className="font-semibold text-sm text-gray-900">{task.title}</h3>

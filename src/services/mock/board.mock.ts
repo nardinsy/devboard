@@ -1,117 +1,7 @@
 import { IBoardRepository } from '../interfaces/board.interface';
 import { Board, ColumnStatus } from '@/features/board/types';
 import { CreateTaskDto, Task, UpdateTaskDto } from '@/features/tasks/types';
-
-let DUMMY_TASKS: Task[] = [
-  {
-    id: 'task-1',
-    title: 'Setup CI/CD pipeline',
-    description: 'Description',
-    priority: 'medium',
-    label: 'feature',
-    status: 'in-progress',
-    assigneeId: '1',
-    boardId: 'board-1',
-    createdAt: '2026-06-01T09:00:00Z',
-    dueDate: '2026-06-20T09:00:00Z',
-  },
-  {
-    id: 'task-2',
-    title: 'Implement drag and drop',
-    description: 'Description',
-    priority: 'high',
-    label: 'perf',
-    status: 'in-review',
-    assigneeId: '1',
-    boardId: 'board-1',
-    createdAt: '2026-06-01T09:00:00Z',
-    dueDate: '2026-06-20T09:00:00Z',
-  },
-  {
-    id: 'task-3',
-    title: 'Write API documentation',
-    description: 'Description',
-    priority: 'low',
-    label: 'docs',
-    status: 'done',
-    assigneeId: '1',
-    boardId: 'board-1',
-    createdAt: '2026-06-01T09:00:00Z',
-    dueDate: '2026-06-20T09:00:00Z',
-  },
-  {
-    id: 'task-4',
-    title: 'Fix search performance bug',
-    description: 'Description',
-    priority: 'low',
-    label: 'bug',
-    status: 'todo',
-    assigneeId: '1',
-    boardId: 'board-1',
-    createdAt: '2026-06-01T09:00:00Z',
-    dueDate: '2026-06-20T09:00:00Z',
-  },
-  {
-    id: 'task-5',
-    title: 'Auth token refresh logic',
-    description: 'Description',
-    priority: 'high',
-    label: 'perf',
-    status: 'done',
-    assigneeId: '1',
-    boardId: 'board-1',
-    createdAt: '2026-06-01T09:00:00Z',
-    dueDate: '2026-06-20T09:00:00Z',
-  },
-  {
-    id: 'task-6',
-    title: 'Add dark mode support',
-    description: 'Description',
-    priority: 'low',
-    label: 'docs',
-    status: 'in-progress',
-    assigneeId: '1',
-    boardId: 'board-1',
-    createdAt: '2026-06-01T09:00:00Z',
-    dueDate: '2026-06-20T09:00:00Z',
-  },
-  {
-    id: 'task-7',
-    title: 'Write unit tests for auth',
-    description: 'Description',
-    priority: 'medium',
-    label: 'docs',
-    status: 'in-review',
-    assigneeId: '1',
-    boardId: 'board-1',
-    createdAt: '2026-06-01T09:00:00Z',
-    dueDate: '2026-06-20T09:00:00Z',
-  },
-  {
-    id: 'task-8',
-    title: 'Fix mobile layout issues',
-    description: 'Description',
-    priority: 'high',
-    label: 'bug',
-    status: 'todo',
-    assigneeId: '1',
-    boardId: 'board-1',
-    createdAt: '2026-06-01T09:00:00Z',
-    dueDate: '2026-06-20T09:00:00Z',
-  },
-];
-
-const DUMMY_BOARD: Board = {
-  id: 'board-1',
-  title: 'Project-1',
-  columns: [
-    { id: 'col-1', title: 'Todo', status: 'todo', taskIds: ['task-4', 'task-8'] },
-    { id: 'col-2', title: 'In Progress', status: 'in-progress', taskIds: ['task-1', 'task-6'] },
-    { id: 'col-3', title: 'In Review', status: 'in-review', taskIds: ['task-2', 'task-7'] },
-    { id: 'col-4', title: 'Done', status: 'done', taskIds: ['task-3', 'task-5'] },
-  ],
-  createdAt: '2026-06-01T09:00:00Z',
-};
+import { DUMMY_TASKS, DUMMY_BOARD } from './mock-data';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -143,7 +33,7 @@ export class MockBoardRepository implements IBoardRepository {
 
     addToBoard(task.status, task.id);
 
-    await delay(500);
+    await delay(0);
     return task;
   }
 
@@ -151,21 +41,22 @@ export class MockBoardRepository implements IBoardRepository {
     const task = DUMMY_TASKS.find((task) => task.id === id);
     if (!task) throw new Error('Task not found');
     deleteFromBoard(task.status, id);
-    DUMMY_TASKS = DUMMY_TASKS.filter((task) => task.id !== id);
+    // DUMMY_TASKS = DUMMY_TASKS.filter((task) => task.id !== id);
+    // TODO I keep deleted task in DUMMY_TASK for now, Fix this
 
-    await delay(500);
+    await delay(0);
   }
 
   async getBoard(boardId: string): Promise<Board> {
     if (DUMMY_BOARD.id !== boardId) throw new Error('Board not found');
 
-    await delay(500);
+    await delay(0);
     return DUMMY_BOARD;
   }
 
   async getTasks(boardId: string): Promise<Task[]> {
     // throw new Error('');
-    await delay(1000);
+    await delay(0);
     const boardExists = DUMMY_BOARD.id === boardId;
     if (!boardExists) throw new Error('Board not found');
     // return DUMMY_TASKS.filter((task) => task.boardId === boardId);
@@ -181,19 +72,19 @@ export class MockBoardRepository implements IBoardRepository {
     if (index === -1) throw new Error('Not found');
     DUMMY_TASKS[index] = { ...DUMMY_TASKS[index], ...data };
 
-    await delay(500);
+    await delay(0);
     return DUMMY_TASKS[index];
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getUserBoards(_userId: string): Promise<Board[]> {
-    await delay(500);
+    await delay(0);
 
     return [DUMMY_BOARD];
   }
 
   async updateColumnOrder(updates: { status: ColumnStatus; taskIds: string[] }[]): Promise<void> {
-    await delay(500);
+    await delay(0);
     updates.forEach((update) => {
       const col = DUMMY_BOARD.columns.find((col) => col.status === update.status);
       if (!col) throw new Error(`Column with status "${update.status}" not found`);
@@ -207,3 +98,114 @@ export class MockBoardRepository implements IBoardRepository {
     });
   }
 }
+
+// let DUMMY_TASKS: Task[] = [
+//   {
+//     id: 'task-1',
+//     title: 'Setup CI/CD pipeline',
+//     description: 'Description',
+//     priority: 'medium',
+//     label: 'feature',
+//     status: 'in-progress',
+//     assigneeId: '1',
+//     boardId: 'board-1',
+//     createdAt: '2026-06-01T09:00:00Z',
+//     dueDate: '2026-06-20T09:00:00Z',
+//   },
+//   {
+//     id: 'task-2',
+//     title: 'Implement drag and drop',
+//     description: 'Description',
+//     priority: 'high',
+//     label: 'perf',
+//     status: 'in-review',
+//     assigneeId: '1',
+//     boardId: 'board-1',
+//     createdAt: '2026-06-01T09:00:00Z',
+//     dueDate: '2026-06-20T09:00:00Z',
+//   },
+//   {
+//     id: 'task-3',
+//     title: 'Write API documentation',
+//     description: 'Description',
+//     priority: 'low',
+//     label: 'docs',
+//     status: 'done',
+//     assigneeId: '1',
+//     boardId: 'board-1',
+//     createdAt: '2026-06-01T09:00:00Z',
+//     dueDate: '2026-06-20T09:00:00Z',
+//   },
+//   {
+//     id: 'task-4',
+//     title: 'Fix search performance bug',
+//     description: 'Description',
+//     priority: 'low',
+//     label: 'bug',
+//     status: 'todo',
+//     assigneeId: '1',
+//     boardId: 'board-1',
+//     createdAt: '2026-06-01T09:00:00Z',
+//     dueDate: '2026-06-20T09:00:00Z',
+//   },
+//   {
+//     id: 'task-5',
+//     title: 'Auth token refresh logic',
+//     description: 'Description',
+//     priority: 'high',
+//     label: 'perf',
+//     status: 'done',
+//     assigneeId: '1',
+//     boardId: 'board-1',
+//     createdAt: '2026-06-01T09:00:00Z',
+//     dueDate: '2026-06-20T09:00:00Z',
+//   },
+//   {
+//     id: 'task-6',
+//     title: 'Add dark mode support',
+//     description: 'Description',
+//     priority: 'low',
+//     label: 'docs',
+//     status: 'in-progress',
+//     assigneeId: '1',
+//     boardId: 'board-1',
+//     createdAt: '2026-06-01T09:00:00Z',
+//     dueDate: '2026-06-20T09:00:00Z',
+//   },
+//   {
+//     id: 'task-7',
+//     title: 'Write unit tests for auth',
+//     description: 'Description',
+//     priority: 'medium',
+//     label: 'docs',
+//     status: 'in-review',
+//     assigneeId: '1',
+//     boardId: 'board-1',
+//     createdAt: '2026-06-01T09:00:00Z',
+//     dueDate: '2026-06-20T09:00:00Z',
+//   },
+//   {
+//     id: 'task-8',
+//     title: 'Fix mobile layout issues',
+//     description: 'Description',
+//     priority: 'high',
+//     label: 'bug',
+//     status: 'todo',
+//     assigneeId: '1',
+//     boardId: 'board-1',
+//     createdAt: '2026-06-01T09:00:00Z',
+//     dueDate: '2026-06-20T09:00:00Z',
+//   },
+// ];
+
+// const DUMMY_BOARD: Board = {
+//   id: 'board-1',
+//   title: 'Project-1',
+//   columns: [
+//     { id: 'col-1', title: 'Todo', status: 'todo', taskIds: ['task-4', 'task-8'] },
+//     { id: 'col-2', title: 'In Progress', status: 'in-progress', taskIds: ['task-1', 'task-6'] },
+//     { id: 'col-3', title: 'In Review', status: 'in-review', taskIds: ['task-2', 'task-7'] },
+//     { id: 'col-4', title: 'Done', status: 'done', taskIds: ['task-3', 'task-5'] },
+//   ],
+//   createdAt: '2026-06-01T09:00:00Z',
+// };
