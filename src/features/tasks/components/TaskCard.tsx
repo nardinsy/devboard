@@ -3,7 +3,7 @@ import { UniqueIdentifier } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
 
-import { MemoizedTaskCardContent } from './TaskCardContent';
+import { TaskCardContent } from './TaskCardContent';
 import { Priority } from '@/features/board/types';
 import { Task } from '../types';
 
@@ -16,6 +16,10 @@ const cardBorderVariants: Record<Priority, string> = {
 export const TaskCard = ({ id, task }: { id: UniqueIdentifier; task: Task }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
+    data: {
+      task,
+      columnId: task.status,
+    },
   });
 
   const style = {
@@ -34,7 +38,7 @@ export const TaskCard = ({ id, task }: { id: UniqueIdentifier; task: Task }) => 
         cardBorderVariants[task.priority]
       )}
     >
-      <MemoizedTaskCardContent task={task} />
+      <TaskCardContent task={task} />
     </li>
   );
 };

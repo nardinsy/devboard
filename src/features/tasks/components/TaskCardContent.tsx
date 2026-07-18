@@ -50,7 +50,7 @@ const TaskAssignee = () => {
   );
 };
 
-export const MemoizedTaskCardContent = ({ task }: { task: Task }) => {
+export const TaskCardContent = React.memo(({ task }: { task: Task }) => {
   return (
     <>
       <h3 className="font-semibold text-sm text-gray-900">{task.title}</h3>
@@ -62,4 +62,4 @@ export const MemoizedTaskCardContent = ({ task }: { task: Task }) => {
       </div>
     </>
   );
-};
+});

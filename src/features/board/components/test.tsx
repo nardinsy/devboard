@@ -1,41 +1,44 @@
 import { useRef, useState } from 'react';
 import {
-  Active,
   DndContext,
   DragEndEvent,
   DragOverEvent,
   DragOverlay,
   DragStartEvent,
   KeyboardSensor,
-  Over,
   PointerSensor,
   UniqueIdentifier,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
-import { ColumnsData, ColumnStatus } from '../types';
+import { ColumnStatus } from '../types';
+import { Task } from '@/features/tasks/types';
 import { BoardColumn } from './BoardColumn';
 import { arrayMove, sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useUpdateColumnOrder } from '../hooks/useUpdateColumnOrder';
 import { TaskOverLay } from '@/features/tasks/components/TaskOverLay';
-import { Task } from '@/features/tasks/types';
-import { toast } from 'sonner';
 
-export const BoardColumns = ({
+interface ColumnsData {
+  id: UniqueIdentifier;
+  status: ColumnStatus;
+  tasks: Task[];
+}
+
+export const BoardColumnsTest = ({
   columnsData,
-  boardId,
   isLoading,
 }: {
   columnsData: ColumnsData[];
-  boardId: string;
   isLoading: boolean;
 }) => {
   const [columns, setColumns] = useState<ColumnsData[]>(columnsData);
-  const [activeItem, setActiveItem] = useState<Task | null>(null);
+  const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
 
   const snapshotRef = useRef<ColumnsData[] | null>(null);
+  const initialColumnIdRef = useRef<UniqueIdentifier | undefined>(null);
 
-  const { mutate } = useUpdateColumnOrder(boardId);
+  // TODO get boardId from props
+  const { mutate } = useUpdateColumnOrder('board-1');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -53,28 +56,29 @@ export const BoardColumns = ({
     mutate(updates, {
       onError: () => {
         setColumns(columnsData);
-        toast.error('Failed to move task. Please try again.');
+        // toast notification
       },
     });
   };
 
-  const findColumnId = (item: Active | Over): UniqueIdentifier | undefined => {
-    if (columns.some((col) => col.id === item.id)) {
-      // for over, which means column itself (empty column)
-      return item.id;
+  const findColumnId = (itemId: UniqueIdentifier) => {
+    if (columns.some((col) => col.id === itemId)) {
+      return itemId;
     }
-    return item.data.current?.columnId;
+
+    return columns.find((col) => col.tasks.some((task) => task.id === itemId))?.id;
   };
 
   const handleDragStart = (event: DragStartEvent) => {
+    initialColumnIdRef.current = findColumnId(event.active.id);
     snapshotRef.current = columns;
-    setActiveItem(event.active.data.current?.task);
+    setActiveId(event.active.id);
   };
 
   const handleDragCancel = () => {
     if (snapshotRef.current) setColumns(snapshotRef.current);
     snapshotRef.current = null;
-    setActiveItem(null);
+    setActiveId(null);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
@@ -84,8 +88,8 @@ export const BoardColumns = ({
     const activeId = active.id;
     const overId = over.id;
 
-    const activeColumnId = findColumnId(active);
-    const overColumnId = findColumnId(over);
+    const activeColumnId = findColumnId(activeId);
+    const overColumnId = findColumnId(overId);
 
     if (!activeColumnId || !overColumnId) return;
 
@@ -99,10 +103,10 @@ export const BoardColumns = ({
       const activeColumn = prev.find((col) => col.id === activeColumnId);
       if (!activeColumn) return prev;
 
-      if (!activeItem) return prev;
-      const updatedTask = { ...activeItem, status: overColumnId as ColumnStatus };
+      const activeTask = activeColumn.tasks.find((task) => task.id === activeId);
+      if (!activeTask) return prev;
 
-      return prev.map((column) => {
+      const newColumns = prev.map((column) => {
         if (column.id === activeColumnId) {
           return {
             ...column,
@@ -115,7 +119,7 @@ export const BoardColumns = ({
           if (overId === overColumnId || overTaskIndex === -1) {
             return {
               ...column,
-              tasks: [...column.tasks, updatedTask],
+              tasks: [...column.tasks, activeTask],
             };
           }
 
@@ -125,12 +129,24 @@ export const BoardColumns = ({
 
           const newIndex = isBelowOverItem ? overTaskIndex + 1 : overTaskIndex;
           const newTasks = [...column.tasks];
-          newTasks.splice(newIndex, 0, updatedTask);
+          newTasks.splice(newIndex, 0, activeTask);
           return { ...column, tasks: newTasks };
+          // if (overTaskIndex !== -1) {
+          //   return {
+          //     ...column,
+          //     tasks: [
+          //       ...column.tasks.slice(0, overTaskIndex + 1),
+          //       activeTask,
+          //       ...column.tasks.slice(overTaskIndex + 1),
+          //     ],
+          //   };
+          // }
         }
 
         return column;
       });
+
+      return newColumns;
     });
   };
 
@@ -140,18 +156,19 @@ export const BoardColumns = ({
     if (!over) {
       if (snapshotRef.current) setColumns(snapshotRef.current);
       snapshotRef.current = null;
-      setActiveItem(null);
+      setActiveId(null);
       return;
     }
 
     const activeId = active.id;
     const overId = over.id;
 
-    const activeColumnId = activeItem?.status;
-    const overColumnId = findColumnId(over);
+    // const activeColumnId = findColumnId(activeId);
+    const activeColumnId = initialColumnIdRef.current;
+    const overColumnId = findColumnId(overId);
 
     if (!activeColumnId || !overColumnId) {
-      setActiveItem(null);
+      setActiveId(null);
       return;
     }
 
@@ -159,7 +176,7 @@ export const BoardColumns = ({
       const columnIndex = columns.findIndex((col) => col.id === activeColumnId);
 
       if (columnIndex === -1) {
-        setActiveItem(null);
+        setActiveId(null);
         return;
       }
 
@@ -186,11 +203,10 @@ export const BoardColumns = ({
     }
 
     if (activeColumnId !== overColumnId && overId) {
-      const sourceCol = columns.find((col) => col.id === activeColumnId);
-      const destCol = columns.find((col) => col.id === overColumnId);
+      const sourceCol = columns.find((col) => col.status === activeColumnId);
+      const destCol = columns.find((col) => col.status === overColumnId);
 
       if (!sourceCol || !destCol) return;
-
       updateColumns([
         {
           status: activeColumnId as ColumnStatus,
@@ -202,10 +218,12 @@ export const BoardColumns = ({
         },
       ]);
     }
-
-    snapshotRef.current = null;
-    setActiveItem(null);
+    setActiveId(null);
   };
+
+  const activeTask = activeId
+    ? columns.flatMap((col) => col.tasks).find((task) => task.id === activeId)
+    : null;
 
   return (
     <DndContext
@@ -217,8 +235,8 @@ export const BoardColumns = ({
     >
       {columns.map((column) => (
         <BoardColumn
-          id={column.id}
           key={column.id}
+          id={column.id}
           status={column.status}
           tasks={column.tasks}
           isLoading={isLoading}
@@ -230,7 +248,7 @@ export const BoardColumns = ({
           duration: 150,
         }}
       >
-        {activeItem ? <TaskOverLay task={activeItem} /> : null}
+        {activeTask ? <TaskOverLay task={activeTask} /> : null}
       </DragOverlay>
     </DndContext>
   );

@@ -59,7 +59,12 @@ export const BoardContent = ({ boardId }: { boardId: string }) => {
           error && 'pointer-events-none'
         )}
       >
-        <BoardColumns key={dataUpdatedAt} isLoading={isLoading} columnsData={boardData} />
+        <BoardColumns
+          key={dataUpdatedAt}
+          columnsData={boardData}
+          boardId={boardId}
+          isLoading={isLoading}
+        />
       </section>
     </div>
   );

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Priority } from '@/features/board/types';
-import { MemoizedTaskCardContent } from './TaskCardContent';
+import { TaskCardContent } from './TaskCardContent';
 import { Task } from '../types';
 
 const cardBorderVariants: Record<Priority, string> = {
@@ -17,7 +17,7 @@ export const TaskOverLay = ({ task }: { task: Task }) => {
         cardBorderVariants[task.priority]
       )}
     >
-      <MemoizedTaskCardContent task={task} />
+      <TaskCardContent task={task} />
     </li>
   );
 };
