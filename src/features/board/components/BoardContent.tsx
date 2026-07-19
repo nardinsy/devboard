@@ -1,41 +1,54 @@
-import { UniqueIdentifier } from '@dnd-kit/core';
 import clsx from 'clsx';
 
 import { useTasks } from '../hooks/useTasks';
 import { BoardColumns } from './BoardColumns';
 import { ColumnStatus } from '../types';
-import { Task } from '@/features/tasks/types';
+import { useMemo } from 'react';
 
 export const BoardContent = ({ boardId }: { boardId: string }) => {
   const { data: tasks, error, isLoading, dataUpdatedAt } = useTasks(boardId);
   // TODO fix this mess
-  const todoTasks = tasks?.filter((task) => task.status === 'todo');
-  const inProgressTasks = tasks?.filter((task) => task.status === 'in-progress');
-  const inReviewTasks = tasks?.filter((task) => task.status === 'in-review');
-  const doneTasks = tasks?.filter((task) => task.status === 'done');
+  // const todoTasks = tasks?.filter((task) => task.status === 'todo');
+  // const inProgressTasks = tasks?.filter((task) => task.status === 'in-progress');
+  // const inReviewTasks = tasks?.filter((task) => task.status === 'in-review');
+  // const doneTasks = tasks?.filter((task) => task.status === 'done');
 
-  const boardData: { id: UniqueIdentifier; status: ColumnStatus; tasks: Task[] }[] = [
-    {
-      id: 'todo',
-      status: 'todo',
-      tasks: todoTasks ?? [],
-    },
-    {
-      id: 'in-progress',
-      status: 'in-progress',
-      tasks: inProgressTasks ?? [],
-    },
-    {
-      id: 'in-review',
-      status: 'in-review',
-      tasks: inReviewTasks ?? [],
-    },
-    {
-      id: 'done',
-      status: 'done',
-      tasks: doneTasks ?? [],
-    },
-  ];
+  // const boardData: { id: UniqueIdentifier; status: ColumnStatus; tasks: Task[] }[] = [
+  //   {
+  //     id: 'todo',
+  //     status: 'todo',
+  //     tasks: todoTasks ?? [],
+  //   },
+  //   {
+  //     id: 'in-progress',
+  //     status: 'in-progress',
+  //     tasks: inProgressTasks ?? [],
+  //   },
+  //   {
+  //     id: 'in-review',
+  //     status: 'in-review',
+  //     tasks: inReviewTasks ?? [],
+  //   },
+  //   {
+  //     id: 'done',
+  //     status: 'done',
+  //     tasks: doneTasks ?? [],
+  //   },
+  // ];
+
+  const boardData = useMemo(() => {
+    const statuses: { id: ColumnStatus; status: ColumnStatus }[] = [
+      { id: 'todo', status: 'todo' },
+      { id: 'in-progress', status: 'in-progress' },
+      { id: 'in-review', status: 'in-review' },
+      { id: 'done', status: 'done' },
+    ];
+
+    return statuses.map((col) => ({
+      ...col,
+      tasks: tasks?.filter((task) => task.status === col.status) ?? [],
+    }));
+  }, [tasks]);
 
   return (
     <div className="relative">
