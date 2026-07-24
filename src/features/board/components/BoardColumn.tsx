@@ -1,12 +1,16 @@
+import { useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useNavigate } from 'react-router-dom';
 import { UniqueIdentifier, useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+
 import clsx from 'clsx';
 import { Plus } from 'lucide-react';
 
 import { TaskCard } from '@/features/tasks/components/TaskCard';
 import { ColumnStatus } from '../types';
 import { Task } from '@/features/tasks/types';
-import { useNavigate, useParams } from 'react-router-dom';
+
 import { ROUTE_BUILDERS } from '@/router/routes';
 
 const statusIconVariants: Record<ColumnStatus, string> = {
@@ -27,32 +31,67 @@ export const BoardColumn = ({
   id,
   status,
   tasks,
+  boardId,
   isLoading,
+  scrollPositions,
+  onScroll,
 }: {
   id: UniqueIdentifier;
   status: ColumnStatus;
   tasks: Task[];
+  boardId: string;
   isLoading: boolean;
+  scrollPositions: number;
+  onScroll: (columnId: string, scrollTop: number) => void;
 }) => {
   const { setNodeRef } = useDroppable({ id });
-  const { boardId } = useParams<{ boardId: string }>();
   const navigate = useNavigate();
+  const parentRef = useRef<HTMLDivElement>(null);
+
+  const virtualizer = useVirtualizer({
+    count: tasks.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 110,
+    overscan: 5,
+    initialOffset: scrollPositions,
+  });
 
   const content =
     tasks.length === 0 ? (
       <div className="flex justify-center py-8 text-gray-400 text-sm">No task yet</div>
     ) : (
-      <ul className="space-y-2.5">
-        {tasks.map((task) => (
-          <TaskCard key={task.id} id={task.id} task={task} />
-        ))}
-      </ul>
+      <div
+        ref={(node) => {
+          setNodeRef(node);
+          parentRef.current = node;
+        }}
+        onScroll={(e) => onScroll(status, e.currentTarget.scrollTop)}
+        className="overflow-y-auto scrollbar-thin"
+      >
+        <ul style={{ height: virtualizer.getTotalSize(), position: 'relative' }}>
+          {virtualizer.getVirtualItems().map((virtualItem) => {
+            const task = tasks[virtualItem.index];
+            return (
+              <li
+                key={task.id}
+                style={{
+                  position: 'absolute',
+                  top: virtualItem.start,
+                  width: '100%',
+                }}
+              >
+                <TaskCard id={task.id} task={task} />
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     );
 
   return (
     <section
       ref={setNodeRef}
-      className="flex flex-col gap-3 bg-neutral-100 rounded-xl p-3 min-w-72"
+      className="flex flex-col gap-3 bg-neutral-100 rounded-xl p-3 min-w-72 max-h-[calc(100vh-100px)]"
     >
       {/* Header */}
       <div className="flex items-center justify-between px-1 text-gray-800">

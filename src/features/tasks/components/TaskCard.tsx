@@ -28,7 +28,7 @@ export const TaskCard = ({ id, task }: { id: UniqueIdentifier; task: Task }) => 
   };
 
   return (
-    <li
+    <div
       ref={setNodeRef}
       style={style}
       {...attributes}
@@ -39,6 +39,6 @@ export const TaskCard = ({ id, task }: { id: UniqueIdentifier; task: Task }) => 
       )}
     >
       <TaskCardContent task={task} />
-    </li>
+    </div>
   );
 };

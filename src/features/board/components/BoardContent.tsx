@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { useTasks } from '../hooks/useTasks';
 import { BoardColumns } from './BoardColumns';
 import { ColumnStatus } from '../types';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 
 export const BoardContent = ({ boardId }: { boardId: string }) => {
   const { data: tasks, error, isLoading, dataUpdatedAt } = useTasks(boardId);
@@ -35,6 +35,11 @@ export const BoardContent = ({ boardId }: { boardId: string }) => {
   //     tasks: doneTasks ?? [],
   //   },
   // ];
+
+  const scrollPositions = useRef<Record<string, number>>({});
+  const saveScrollPosition = (columnId: string, scrollTop: number) => {
+    scrollPositions.current[columnId] = scrollTop;
+  };
 
   const boardData = useMemo(() => {
     const statuses: { id: ColumnStatus; status: ColumnStatus }[] = [
@@ -68,7 +73,7 @@ export const BoardContent = ({ boardId }: { boardId: string }) => {
 
       <section
         className={clsx(
-          'overflow-x-scroll h-screen flex flex-row gap-2 px-2 md:justify-center py-2',
+          'overflow-x-scroll lg:overflow-x-hidden overflow-y-hidden flex flex-row gap-2 px-2 md:justify-center py-1',
           error && 'pointer-events-none'
         )}
       >
@@ -77,6 +82,8 @@ export const BoardContent = ({ boardId }: { boardId: string }) => {
           columnsData={boardData}
           boardId={boardId}
           isLoading={isLoading}
+          scrollPositions={scrollPositions}
+          onScroll={saveScrollPosition}
         />
       </section>
     </div>

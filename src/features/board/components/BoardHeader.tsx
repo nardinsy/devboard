@@ -9,7 +9,7 @@ export const BoardHeader = ({ board }: { board: Board }) => {
   if (!user) return null;
 
   return (
-    <header className="flex justify-between items-center bg-white p-4 border-b-2 shadow-2xs">
+    <header className="flex justify-between items-center p-4 border-b-2 shadow-2xs">
       <h3 className="font-semibold text-lg text-gray-900">{board?.title}</h3>
 
       <div className="flex items-center gap-4">

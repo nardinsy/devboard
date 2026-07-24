@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   Active,
   DndContext,
@@ -25,14 +25,17 @@ export const BoardColumns = ({
   columnsData,
   boardId,
   isLoading,
+  scrollPositions,
+  onScroll,
 }: {
   columnsData: ColumnsData[];
   boardId: string;
   isLoading: boolean;
+  scrollPositions: React.RefObject<Record<string, number>>;
+  onScroll: (columnId: string, scrollTop: number) => void;
 }) => {
   const [columns, setColumns] = useState<ColumnsData[]>(columnsData);
   const [activeItem, setActiveItem] = useState<Task | null>(null);
-
   const snapshotRef = useRef<ColumnsData[] | null>(null);
 
   const { mutate } = useUpdateColumnOrder(boardId);
@@ -214,6 +217,13 @@ export const BoardColumns = ({
       onDragCancel={handleDragCancel}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
+      autoScroll={{
+        threshold: {
+          x: 0.2,
+          y: 0.2,
+        },
+        acceleration: 10,
+      }}
     >
       {columns.map((column) => (
         <BoardColumn
@@ -221,7 +231,10 @@ export const BoardColumns = ({
           key={column.id}
           status={column.status}
           tasks={column.tasks}
+          boardId={boardId}
           isLoading={isLoading}
+          scrollPositions={scrollPositions.current?.[column.status] ?? 0}
+          onScroll={onScroll}
         />
       ))}
 
