@@ -1,21 +1,8 @@
 import { IBoardRepository } from '../interfaces/board.interface';
 import { Board, ColumnStatus } from '@/features/board/types';
 import { CreateTaskDto, Task, UpdateTaskDto } from '@/features/tasks/types';
-import { DUMMY_TASKS, DUMMY_BOARD } from './mock-data';
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const addToBoard = (status: ColumnStatus, taskId: string) => {
-  const index = DUMMY_BOARD.columns.findIndex((col) => col.status === status);
-  DUMMY_BOARD.columns[index].taskIds.push(taskId);
-};
-
-const deleteFromBoard = (status: ColumnStatus, taskId: string) => {
-  const index = DUMMY_BOARD.columns.findIndex((col) => col.status === status);
-  DUMMY_BOARD.columns[index].taskIds = DUMMY_BOARD.columns[index].taskIds.filter(
-    (task) => task !== taskId
-  );
-};
 
 const createTaskFromDto = (dto: CreateTaskDto, assigneeId: string = '1'): Task => {
   return {
@@ -27,20 +14,40 @@ const createTaskFromDto = (dto: CreateTaskDto, assigneeId: string = '1'): Task =
 };
 
 export class MockBoardRepository implements IBoardRepository {
+  private board: Board;
+  private tasks: Task[];
+
+  constructor(board: Board, tasks: Task[]) {
+    this.board = board;
+    this.tasks = tasks;
+  }
+
+  private addToBoard(status: ColumnStatus, taskId: string) {
+    const column = this.board.columns.find((col) => col.status === status);
+    if (!column) throw new Error(`Column with status "${status}" not found`);
+    column.taskIds.push(taskId);
+  }
+
+  private deleteFromBoard(status: ColumnStatus, taskId: string) {
+    const column = this.board.columns.find((col) => col.status === status);
+    if (!column) throw new Error(`Column with status "${status}" not found`);
+    column.taskIds = column.taskIds.filter((task) => task !== taskId);
+  }
+
   async createTask(data: CreateTaskDto): Promise<Task> {
     const task = createTaskFromDto(data);
-    DUMMY_TASKS.push(task);
+    this.tasks.push(task);
 
-    addToBoard(task.status, task.id);
+    this.addToBoard(task.status, task.id);
 
     await delay(0);
     return task;
   }
 
   async deleteTask(id: string): Promise<void> {
-    const task = DUMMY_TASKS.find((task) => task.id === id);
+    const task = this.tasks.find((task) => task.id === id);
     if (!task) throw new Error('Task not found');
-    deleteFromBoard(task.status, id);
+    this.deleteFromBoard(task.status, id);
     // DUMMY_TASKS = DUMMY_TASKS.filter((task) => task.id !== id);
     // TODO I keep deleted task in DUMMY_TASK for now, Fix this
 
@@ -48,164 +55,53 @@ export class MockBoardRepository implements IBoardRepository {
   }
 
   async getBoard(boardId: string): Promise<Board> {
-    if (DUMMY_BOARD.id !== boardId) throw new Error('Board not found');
+    if (this.board.id !== boardId) throw new Error('Board not found');
 
     await delay(0);
-    return DUMMY_BOARD;
+    return this.board;
   }
 
   async getTasks(boardId: string): Promise<Task[]> {
     // throw new Error('');
     await delay(0);
-    const boardExists = DUMMY_BOARD.id === boardId;
+    const boardExists = this.board.id === boardId;
     if (!boardExists) throw new Error('Board not found');
     // return DUMMY_TASKS.filter((task) => task.boardId === boardId);
-    return DUMMY_BOARD.columns.flatMap((col) =>
+    return this.board.columns.flatMap((col) =>
       col.taskIds
-        .map((id) => DUMMY_TASKS.find((task) => task.id === id))
+        .map((id) => this.tasks.find((task) => task.id === id))
         .filter((task): task is Task => task !== undefined)
     );
   }
 
   async updateTask(id: string, data: UpdateTaskDto): Promise<Task> {
-    const index = DUMMY_TASKS.findIndex((task) => id === task.id);
+    const index = this.tasks.findIndex((task) => id === task.id);
     if (index === -1) throw new Error('Not found');
-    DUMMY_TASKS[index] = { ...DUMMY_TASKS[index], ...data };
+    this.tasks[index] = { ...this.tasks[index], ...data };
 
     await delay(0);
-    return DUMMY_TASKS[index];
+    return this.tasks[index];
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async getUserBoards(_userId: string): Promise<Board[]> {
     await delay(0);
 
-    return [DUMMY_BOARD];
+    return [this.board];
   }
 
   async updateColumnOrder(updates: { status: ColumnStatus; taskIds: string[] }[]): Promise<void> {
     await delay(0);
     updates.forEach((update) => {
-      const col = DUMMY_BOARD.columns.find((col) => col.status === update.status);
+      const col = this.board.columns.find((col) => col.status === update.status);
       if (!col) throw new Error(`Column with status "${update.status}" not found`);
       col.taskIds = update.taskIds;
 
       update.taskIds.forEach((tId) => {
-        const t = DUMMY_TASKS.find((task) => tId === task.id);
+        const t = this.tasks.find((task) => tId === task.id);
         if (!t) throw new Error(`Task with id "${tId}" not found`);
         t.status = update.status;
       });
     });
   }
 }
-
-// let DUMMY_TASKS: Task[] = [
-//   {
-//     id: 'task-1',
-//     title: 'Setup CI/CD pipeline',
-//     description: 'Description',
-//     priority: 'medium',
-//     label: 'feature',
-//     status: 'in-progress',
-//     assigneeId: '1',
-//     boardId: 'board-1',
-//     createdAt: '2026-06-01T09:00:00Z',
-//     dueDate: '2026-06-20T09:00:00Z',
-//   },
-//   {
-//     id: 'task-2',
-//     title: 'Implement drag and drop',
-//     description: 'Description',
-//     priority: 'high',
-//     label: 'perf',
-//     status: 'in-review',
-//     assigneeId: '1',
-//     boardId: 'board-1',
-//     createdAt: '2026-06-01T09:00:00Z',
-//     dueDate: '2026-06-20T09:00:00Z',
-//   },
-//   {
-//     id: 'task-3',
-//     title: 'Write API documentation',
-//     description: 'Description',
-//     priority: 'low',
-//     label: 'docs',
-//     status: 'done',
-//     assigneeId: '1',
-//     boardId: 'board-1',
-//     createdAt: '2026-06-01T09:00:00Z',
-//     dueDate: '2026-06-20T09:00:00Z',
-//   },
-//   {
-//     id: 'task-4',
-//     title: 'Fix search performance bug',
-//     description: 'Description',
-//     priority: 'low',
-//     label: 'bug',
-//     status: 'todo',
-//     assigneeId: '1',
-//     boardId: 'board-1',
-//     createdAt: '2026-06-01T09:00:00Z',
-//     dueDate: '2026-06-20T09:00:00Z',
-//   },
-//   {
-//     id: 'task-5',
-//     title: 'Auth token refresh logic',
-//     description: 'Description',
-//     priority: 'high',
-//     label: 'perf',
-//     status: 'done',
-//     assigneeId: '1',
-//     boardId: 'board-1',
-//     createdAt: '2026-06-01T09:00:00Z',
-//     dueDate: '2026-06-20T09:00:00Z',
-//   },
-//   {
-//     id: 'task-6',
-//     title: 'Add dark mode support',
-//     description: 'Description',
-//     priority: 'low',
-//     label: 'docs',
-//     status: 'in-progress',
-//     assigneeId: '1',
-//     boardId: 'board-1',
-//     createdAt: '2026-06-01T09:00:00Z',
-//     dueDate: '2026-06-20T09:00:00Z',
-//   },
-//   {
-//     id: 'task-7',
-//     title: 'Write unit tests for auth',
-//     description: 'Description',
-//     priority: 'medium',
-//     label: 'docs',
-//     status: 'in-review',
-//     assigneeId: '1',
-//     boardId: 'board-1',
-//     createdAt: '2026-06-01T09:00:00Z',
-//     dueDate: '2026-06-20T09:00:00Z',
-//   },
-//   {
-//     id: 'task-8',
-//     title: 'Fix mobile layout issues',
-//     description: 'Description',
-//     priority: 'high',
-//     label: 'bug',
-//     status: 'todo',
-//     assigneeId: '1',
-//     boardId: 'board-1',
-//     createdAt: '2026-06-01T09:00:00Z',
-//     dueDate: '2026-06-20T09:00:00Z',
-//   },
-// ];
-
-// const DUMMY_BOARD: Board = {
-//   id: 'board-1',
-//   title: 'Project-1',
-//   columns: [
-//     { id: 'col-1', title: 'Todo', status: 'todo', taskIds: ['task-4', 'task-8'] },
-//     { id: 'col-2', title: 'In Progress', status: 'in-progress', taskIds: ['task-1', 'task-6'] },
-//     { id: 'col-3', title: 'In Review', status: 'in-review', taskIds: ['task-2', 'task-7'] },
-//     { id: 'col-4', title: 'Done', status: 'done', taskIds: ['task-3', 'task-5'] },
-//   ],
-//   createdAt: '2026-06-01T09:00:00Z',
-// };
