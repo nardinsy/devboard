@@ -61,6 +61,14 @@ export class MockBoardRepository implements IBoardRepository {
     return this.board;
   }
 
+  async getTasksIdByStatus(status: ColumnStatus): Promise<string[]> {
+    await delay(0);
+    const column = this.board.columns.find((column) => column.status === status);
+    if (!column) throw new Error(`Column with status ${status} not found`);
+
+    return column.taskIds;
+  }
+
   async getTasks(boardId: string): Promise<Task[]> {
     // throw new Error('');
     await delay(0);
