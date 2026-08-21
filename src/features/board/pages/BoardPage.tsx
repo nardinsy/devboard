@@ -8,6 +8,7 @@ import { NewTaskForm } from '@/features/tasks/components/NewTaskForm';
 import { BoardContent } from '../components/BoardContent';
 import { BoardHeader } from '../components/BoardHeader';
 import { ColumnStatus } from '../types';
+import { useCallback } from 'react';
 
 const BoardPage = () => {
   const { boardId } = useParams<{ boardId: string }>();
@@ -17,12 +18,12 @@ const BoardPage = () => {
 
   const showModal = !!searchParams.get('createTask');
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setSearchParams((searchParams) => {
-      if (searchParams) searchParams.delete('createTask');
+      searchParams.delete('createTask');
       return searchParams;
     });
-  };
+  }, [setSearchParams]);
 
   if (isLoading) return <LoadingScreen />;
   if (error || !board || !boardId) return <NotFoundPage />;
@@ -32,7 +33,7 @@ const BoardPage = () => {
       <BoardHeader board={board} />
       <BoardContent boardId={boardId} />
       {showModal && (
-        <Modal onClosed={handleCloseModal} title="Create a new task">
+        <Modal onClose={handleCloseModal} title="Create a new task">
           <NewTaskForm
             boardId={boardId}
             status={searchParams.get('createTask') as ColumnStatus}
